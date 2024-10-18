@@ -1,22 +1,38 @@
 <template>
   <v-container fluid class="home-container">
     <v-row align="center" justify="center">
-      <v-col cols="12" md="8" class="text-center">
-        <v-card elevation="10" class="pa-5">
-          <v-card-title class="headline">Bem-vindo ao Sistema de Aluguel de Carros!</v-card-title>
+      <v-col cols="12" md="8" lg="6" class="text-center">
+        <v-card elevation="12" class="pa-5 home-card">
+          <v-card-title class="headline">
+            BEM-VINDO AO <br />
+            SISTEMA DE ALUGUEL DE CARROS!
+          </v-card-title>
+
+          <v-divider class="my-4"></v-divider>
 
           <v-card-text>
             <p class="subheading">
-              Gerencie usuários, carros, aluguéis e pagamentos de maneira simples e eficiente.
+              Gerencie usuários, carros, aluguéis e pagamentos <br />
+              de maneira simples e eficiente.
             </p>
           </v-card-text>
 
           <v-card-actions class="justify-center">
-            <v-btn color="primary" @click="$router.push('/carros')" class="ma-2">
-              Ver Carros Disponíveis
+            <v-btn
+              color="primary"
+              large
+              class="ma-2 home-btn"
+              @click="$router.push('/carros')"
+            >
+              ver carros disponíveis
             </v-btn>
-            <v-btn color="secondary" @click="$router.push('/alugueis')" class="ma-2">
-              Meus Aluguéis
+            <v-btn
+              color="secondary"
+              large
+              class="ma-2 home-btn"
+              @click="$router.push('/alugueis')"
+            >
+              meus aluguéis
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -37,28 +53,48 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f2f5;
+  background: linear-gradient(135deg, #d0e8f2 0%, #f8f9fa 100%);
 }
 
+/* Título em uppercase */
 .headline {
-  font-weight: bold;
-  color: #1976d2;
+  font-weight: 700;
+  color: #1565c0;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
 .subheading {
-  font-size: 1.2rem;
-  margin-top: 10px;
-  color: #757575;
+  font-size: 1.1rem;
+  color: #616161;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-.v-card {
+.home-card {
   background-color: #ffffff;
-  padding: 30px;
-  border-radius: 10px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .v-btn {
-  width: 200px;
+  width: 240px;
   font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Remover o uppercase dos botões */
+.v-btn .v-btn__content {
+  font-size: 1rem;
+}
+
+.home-btn {
+  padding: 20px;
+  font-size: 1rem;
 }
 </style>
