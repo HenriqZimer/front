@@ -1,5 +1,4 @@
 import Login from '../../src/components/Login/Login.vue';
-
 import { describe, it, expect, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createVuetify } from "vuetify";
