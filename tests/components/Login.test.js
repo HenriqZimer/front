@@ -46,5 +46,40 @@ describe("Login Component", () => {
     const passwordField = wrapper.find('input[type="password"]');
     expect(passwordField.exists()).toBe(true);
   });
-});
 
+  it("deve atualizar o valor do campo de e-mail ao preencher", async () => {
+    const wrapper = mount(Login, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    // Encontra o campo de e-mail
+    const emailField = wrapper.find('input[type="email"]');
+    expect(emailField.exists()).toBe(true);
+
+    // Simula o preenchimento do campo de e-mail
+    await emailField.setValue("teste@example.com");
+
+    // Verifica se o modelo foi atualizado
+    expect(wrapper.vm.email).toBe("teste@example.com");
+  });
+
+  it("deve atualizar o valor do campo de senha ao preencher", async () => {
+    const wrapper = mount(Login, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    // Encontra o campo de senha
+    const passwordField = wrapper.find('input[type="password"]');
+    expect(passwordField.exists()).toBe(true);
+
+    // Simula o preenchimento do campo de senha
+    await passwordField.setValue("senha123");
+
+    // Verifica se o modelo foi atualizado
+    expect(wrapper.vm.senha).toBe("senha123");
+  });
+});

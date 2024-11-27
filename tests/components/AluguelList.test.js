@@ -15,6 +15,59 @@ describe("AluguelList Component", () => {
     });
   });
 
+  const alugueisMock = [
+    {
+      _id: "1",
+      dataInicio: "2024-11-01",
+      dataFim: "2024-11-10",
+      valorTotal: 500,
+      status: "em andamento",
+    },
+  ];
+
+  it("deve chamar o método de editar ao clicar no botão de editar", async () => {
+    const editHandler = vi.fn();
+    const wrapper = mount(AluguelList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          alugueis: alugueisMock,
+          actions: [
+            {
+              name: "edit",
+              icon: "mdi-pencil",
+              color: "primary",
+              handler: editHandler,
+            },
+          ],
+        };
+      },
+    });
+
+    const editButton = wrapper.find('[aria-label="edit"]');
+    await editButton.trigger("click");
+
+    expect(editHandler).toHaveBeenCalledWith("1");
+  });
+
+  it("deve exibir a mensagem de lista vazia quando não há itens", () => {
+    const wrapper = mount(AluguelList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          alugueis: [],
+        };
+      },
+    });
+
+    const emptyMessage = wrapper.find(".v-card-text");
+    expect(emptyMessage.text()).toBe("Não há aluguéis cadastrados no momento.");
+  });
+
   it("deve renderizar os botões corretamente", () => {
     const alugueisMock = [
       {

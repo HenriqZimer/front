@@ -5,7 +5,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-describe("CarroForm Component", () => {
+describe("CarroForm - Preenchimento de Campos", () => {
   let vuetify;
 
   beforeEach(() => {
@@ -13,6 +13,34 @@ describe("CarroForm Component", () => {
       components,
       directives,
     });
+  });
+
+  it("deve atualizar o valor do campo 'modelo' ao preencher", async () => {
+    const wrapper = mount(CarroForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const modeloField = wrapper.findAllComponents({ name: "VTextField" })[0];
+    const input = modeloField.find("input");
+
+    await input.setValue("Civic");
+    expect(wrapper.vm.carro.modelo).toBe("Civic");
+  });
+
+  it("deve atualizar o valor do campo 'marca' ao preencher", async () => {
+    const wrapper = mount(CarroForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const marcaField = wrapper.findAllComponents({ name: "VTextField" })[1];
+    const input = marcaField.find("input");
+
+    await input.setValue("Honda");
+    expect(wrapper.vm.carro.marca).toBe("Honda");
   });
 
   it("deve renderizar o formulário corretamente", () => {

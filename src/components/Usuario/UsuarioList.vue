@@ -36,6 +36,7 @@
                           :icon="true"
                           :small="true"
                           :color="action.color"
+                          :aria-label="action.name"
                           @click="action.handler(usuario._id)"
                         >
                           <v-icon>{{ action.icon }}</v-icon>

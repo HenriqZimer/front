@@ -23,10 +23,53 @@ describe("CarroList Component", () => {
       ano: 2022,
       placa: "ABC1234",
       cor: "Preto",
-      status: "disponivel",
       precoPorDia: 200,
+      status: "disponível",
     },
   ];
+
+  it("deve chamar o método de excluir ao clicar no botão de excluir", async () => {
+    const deleteHandler = vi.fn();
+    const wrapper = mount(CarroList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          carros: carrosMock,
+          actions: [
+            {
+              name: "delete",
+              icon: "mdi-delete",
+              color: "red",
+              handler: deleteHandler,
+            },
+          ],
+        };
+      },
+    });
+
+    const deleteButton = wrapper.find('[aria-label="delete"]');
+    await deleteButton.trigger("click");
+
+    expect(deleteHandler).toHaveBeenCalledWith("1");
+  });
+
+  it("deve exibir a mensagem de lista vazia quando não há itens", () => {
+    const wrapper = mount(CarroList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          carros: [],
+        };
+      },
+    });
+
+    const emptyMessage = wrapper.find(".v-card-text");
+    expect(emptyMessage.text()).toBe("Não há carros cadastrados no momento.");
+  });
 
   it("deve renderizar os itens da lista corretamente", () => {
     const wrapper = mount(CarroList, {

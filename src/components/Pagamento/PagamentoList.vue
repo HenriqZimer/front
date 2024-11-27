@@ -42,6 +42,7 @@
                           :small="true"
                           :color="action.color"
                           :class="action.class"
+                          :aria-label="action.name"
                           @click="action.handler(pagamento._id)"
                         >
                           <v-icon>{{ action.icon }}</v-icon>

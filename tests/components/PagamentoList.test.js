@@ -18,13 +18,56 @@ describe("PagamentoList Component", () => {
   const pagamentosMock = [
     {
       _id: "1",
-      idCliente: "123",
-      idCarro: "456",
+      idCliente: "12345",
+      idCarro: "67890",
       dataPagamento: "2024-11-01",
       valor: 200,
       formaPagamento: "Cartão",
     },
   ];
+
+  it("deve chamar o método de editar ao clicar no botão de editar", async () => {
+    const editHandler = vi.fn();
+    const wrapper = mount(PagamentoList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          pagamentos: pagamentosMock,
+          actions: [
+            {
+              name: "edit",
+              icon: "mdi-pencil",
+              color: "primary",
+              handler: editHandler,
+            },
+          ],
+        };
+      },
+    });
+
+    const editButton = wrapper.find('[aria-label="edit"]');
+    await editButton.trigger("click");
+
+    expect(editHandler).toHaveBeenCalledWith("1");
+  });
+
+  it("deve exibir a mensagem de lista vazia quando não há itens", () => {
+    const wrapper = mount(PagamentoList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          pagamentos: [],
+        };
+      },
+    });
+
+    const emptyMessage = wrapper.find(".v-card-text");
+    expect(emptyMessage.text()).toBe("Não há pagamentos cadastrados no momento.");
+  });
 
   it("deve renderizar os itens da lista corretamente", () => {
     const wrapper = mount(PagamentoList, {
@@ -33,19 +76,28 @@ describe("PagamentoList Component", () => {
       },
       data() {
         return {
-          pagamentos: pagamentosMock,
+          pagamentos: [
+            {
+              _id: "1",
+              idCliente: "123",
+              idCarro: "456", // Atualizado para corresponder ao teste
+              dataPagamento: "2024-11-01",
+              valor: 200,
+              formaPagamento: "Cartão",
+            },
+          ],
         };
       },
     });
-
-    // Verifica se o item da lista está renderizado
-    const listItems = wrapper.findAllComponents({ name: "VListItem" });
+  
+    const listItems = wrapper.findAll(".v-list-item");
     expect(listItems.length).toBe(1);
     expect(listItems[0].text()).toContain("Cliente: 123");
     expect(listItems[0].text()).toContain("Carro: 456");
     expect(listItems[0].text()).toContain("R$ 200");
     expect(listItems[0].text()).toContain("Cartão");
   });
+  
 
   it("deve renderizar os botões corretamente", () => {
     const wrapper = mount(PagamentoList, {

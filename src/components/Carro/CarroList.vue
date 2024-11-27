@@ -18,10 +18,9 @@
                   <v-col cols="9">
                     <v-list-item-content>
                       <v-list-item-title>
-                        {{ carro.marca }} - {{ carro.modelo }} ({{ carro.ano }}) | Placa:
-                        {{ carro.placa }} | Status: {{ carro.status }} | R$ {{
-                          carro.precoPorDia
-                        }}/dia
+                        {{ carro.marca }} - {{ carro.modelo }} ({{ carro.ano }})
+                        | Placa: {{ carro.placa }} | Status:
+                        {{ carro.status }} | R$ {{ carro.precoPorDia }}/dia
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-col>
@@ -35,6 +34,7 @@
                           :small="true"
                           :color="action.color"
                           :class="action.class"
+                          :aria-label="action.name"
                           @click="action.handler(carro._id)"
                         >
                           <v-icon>{{ action.icon }}</v-icon>

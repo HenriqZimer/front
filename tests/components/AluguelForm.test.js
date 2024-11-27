@@ -5,17 +5,43 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-describe("AluguelForm Component", () => {
+describe("AluguelForm - Preenchimento de Campos", () => {
   let vuetify;
 
   beforeEach(() => {
-    // Configuração do Vuetify
     vuetify = createVuetify({
       components,
       directives,
     });
   });
 
+  it("deve atualizar o valor do campo 'dataInicio' ao preencher", async () => {
+    const wrapper = mount(AluguelForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const dataInicioField = wrapper.findAllComponents({ name: "VTextField" })[2];
+    const input = dataInicioField.find("input");
+
+    await input.setValue("2024-11-01");
+    expect(wrapper.vm.aluguel.dataInicio).toBe("2024-11-01");
+  });
+
+  it("deve atualizar o valor do campo 'valorTotal' ao preencher", async () => {
+    const wrapper = mount(AluguelForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const valorTotalField = wrapper.findAllComponents({ name: "VTextField" })[4];
+    const input = valorTotalField.find("input");
+
+    await input.setValue("500");
+    expect(wrapper.vm.aluguel.valorTotal).toBe("500");
+  });
   it("deve renderizar o v-card corretamente", () => {
     const wrapper = mount(AluguelForm, {
       global: {

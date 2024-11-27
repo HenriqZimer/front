@@ -23,6 +23,49 @@ describe("UsuarioList Component", () => {
     },
   ];
 
+  it("deve chamar o método de excluir ao clicar no botão de excluir", async () => {
+    const deleteHandler = vi.fn();
+    const wrapper = mount(UsuarioList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          usuarios: usuariosMock,
+          actions: [
+            {
+              name: "delete",
+              icon: "mdi-delete",
+              color: "red",
+              handler: deleteHandler,
+            },
+          ],
+        };
+      },
+    });
+
+    const deleteButton = wrapper.find('[aria-label="delete"]');
+    await deleteButton.trigger("click");
+
+    expect(deleteHandler).toHaveBeenCalledWith("1");
+  });
+
+  it("deve exibir a mensagem de lista vazia quando não há itens", () => {
+    const wrapper = mount(UsuarioList, {
+      global: {
+        plugins: [vuetify],
+      },
+      data() {
+        return {
+          usuarios: [],
+        };
+      },
+    });
+
+    const emptyMessage = wrapper.find(".v-card-text");
+    expect(emptyMessage.text()).toBe("Não há usuários cadastrados no momento.");
+  });
+
   it("deve renderizar os itens da lista corretamente", () => {
     const wrapper = mount(UsuarioList, {
       global: {

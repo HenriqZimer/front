@@ -5,7 +5,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-describe("PagamentoForm Component", () => {
+describe("PagamentoForm - Preenchimento de Campos", () => {
   let vuetify;
 
   beforeEach(() => {
@@ -13,6 +13,33 @@ describe("PagamentoForm Component", () => {
       components,
       directives,
     });
+  });
+
+  it("deve atualizar o valor do campo 'idCliente' ao preencher", async () => {
+    const wrapper = mount(PagamentoForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const idClienteField = wrapper.findAllComponents({ name: "VTextField" })[0];
+    const input = idClienteField.find("input");
+
+    await input.setValue("12345");
+    expect(wrapper.vm.pagamento.idCliente).toBe("12345");
+  });
+
+  it("deve atualizar o valor do campo 'formaPagamento' ao selecionar", async () => {
+    const wrapper = mount(PagamentoForm, {
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const formaPagamentoField = wrapper.findAllComponents({ name: "VSelect" })[0];
+    await formaPagamentoField.vm.$emit("update:modelValue", "Cartão");
+
+    expect(wrapper.vm.pagamento.formaPagamento).toBe("Cartão");
   });
 
   it("deve renderizar o formulário corretamente", () => {
