@@ -2,12 +2,14 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <!-- Verifica se há aluguéis na lista -->
-        <v-card v-if="alugueis.length > 0" elevation="1" class="aluguel-card">
+        <!-- Card de Aluguéis -->
+        <v-card
+          v-if="alugueis.length > 0"
+          elevation="1"
+          class="aluguel-card"
+        >
           <v-card-title class="text-h6">Lista de Aluguéis</v-card-title>
-
           <v-divider></v-divider>
-
           <v-card-text>
             <v-list dense>
               <v-list-item
@@ -16,37 +18,31 @@
                 class="aluguel-list-item"
               >
                 <v-row align="center" justify="space-between" class="pa-4">
-                  <!-- Informações do aluguel à esquerda -->
+                  <!-- Informações do aluguel -->
                   <v-col cols="9">
                     <v-list-item-content>
                       <v-list-item-title>
-                        Data: {{ aluguel.dataInicio }} até
-                        {{ aluguel.dataFim }} | Valor: R$
-                        {{ aluguel.valorTotal }} | Status: {{ aluguel.status }}
+                        Data: {{ aluguel.dataInicio }} até {{ aluguel.dataFim }}
+                        | Valor: R$ {{ aluguel.valorTotal }} | Status:
+                        {{ aluguel.status }}
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-col>
 
-                  <!-- Botões de editar e excluir à direita -->
+                  <!-- Botões de ação -->
                   <v-col cols="3" class="d-flex justify-end">
                     <v-list-item-action>
-                      <v-btn
-                        icon
-                        small
-                        color="primary"
-                        class="mr-2"
-                        @click="$router.push(`/alugueis/${aluguel._id}/editar`)"
-                      >
-                        <v-icon>mdi-pencil</v-icon>
-                      </v-btn>
-                      <v-btn
-                        icon
-                        small
-                        color="red"
-                        @click="deleteAluguel(aluguel._id)"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
+                      <template v-for="action in actions" :key="action.name">
+                        <v-btn
+                          :icon="true"
+                          :small="true"
+                          :color="action.color"
+                          :class="action.class"
+                          @click="action.handler(aluguel._id)"
+                        >
+                          <v-icon>{{ action.icon }}</v-icon>
+                        </v-btn>
+                      </template>
                     </v-list-item-action>
                   </v-col>
                 </v-row>
@@ -55,10 +51,10 @@
           </v-card-text>
         </v-card>
 
-        <!-- Mensagem de "nenhum aluguel encontrado" caso a lista esteja vazia -->
+        <!-- Mensagem de lista vazia -->
         <v-card v-else elevation="1" class="aluguel-card">
           <v-card-title class="text-h6">Nenhum Aluguel Encontrado</v-card-title>
-          <v-card-text>Não há aluguéis cadastrados no momento.</v-card-text>
+          <v-card-text>{{ emptyMessage }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -72,40 +68,60 @@ export default {
   data() {
     return {
       alugueis: [],
+      actions: [
+        {
+          name: "edit",
+          icon: "mdi-pencil",
+          color: "primary",
+          class: "mr-2",
+          handler: (id) => this.editAluguel(id),
+        },
+        {
+          name: "delete",
+          icon: "mdi-delete",
+          color: "red",
+          handler: (id) => this.deleteAluguel(id),
+        },
+      ],
+      emptyMessage: "Não há aluguéis cadastrados no momento.",
     };
   },
   created() {
     this.fetchAlugueis();
   },
   methods: {
-    async fetchAlugueis() {
+    async handleApiRequest(method, url, onSuccess, errorMessage) {
       try {
-        const response = await axios.get("http://localhost:3000/alugueis");
-        this.alugueis = response.data;
+        const response = await axios[method](url);
+        if (onSuccess) onSuccess(response.data);
       } catch (error) {
-        console.error("Erro ao buscar aluguéis:", error);
+        console.error(errorMessage, error);
       }
     },
-    async deleteAluguel(id) {
-      try {
-        await axios.delete(`http://localhost:3000/alugueis/${id}`);
-        this.fetchAlugueis(); // Atualiza a lista após exclusão
-      } catch (error) {
-        console.error("Erro ao excluir aluguel:", error);
-      }
+    fetchAlugueis() {
+      this.handleApiRequest(
+        "get",
+        "http://localhost:3000/alugueis",
+        (data) => (this.alugueis = data),
+        "Erro ao buscar aluguéis"
+      );
+    },
+    deleteAluguel(id) {
+      this.handleApiRequest(
+        "delete",
+        `http://localhost:3000/alugueis/${id}`,
+        () => this.fetchAlugueis(),
+        "Erro ao excluir aluguel"
+      );
+    },
+    editAluguel(id) {
+      this.$router.push(`/alugueis/${id}/editar`);
     },
   },
 };
 </script>
 
 <style scoped>
-.aluguel-link {
-  text-decoration: none;
-  color: #1e88e5;
-  font-weight: 500;
-  font-size: 16px;
-}
-
 .aluguel-list-item {
   padding: 10px 16px;
   border-radius: 8px;
@@ -139,25 +155,9 @@ export default {
   background-color: #ffffff;
 }
 
-.v-card-text {
-  padding-top: 0;
-}
-
 .aluguel-card {
   margin-bottom: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.v-divider {
-  margin: 8px 0;
-}
-
-.mr-2 {
-  margin-right: 8px;
-}
-
-.background-color {
-  background-color: #e3f2fd; /* Cor de fundo cinza claro */
 }
 </style>

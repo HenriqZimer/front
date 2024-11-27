@@ -2,12 +2,14 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <!-- Verifica se há usuários na lista -->
-        <v-card v-if="usuarios.length > 0" elevation="1" class="user-card">
+        <!-- Card de Usuários -->
+        <v-card
+          v-if="usuarios.length > 0"
+          elevation="1"
+          class="user-card"
+        >
           <v-card-title class="text-h6">Lista de Usuários</v-card-title>
-
           <v-divider></v-divider>
-
           <v-card-text>
             <v-list dense>
               <v-list-item
@@ -16,38 +18,29 @@
                 class="user-list-item"
               >
                 <v-row align="center" justify="space-between" class="pa-4">
-                  <!-- Nome e email do usuário à esquerda -->
+                  <!-- Informações do usuário -->
                   <v-col cols="9">
                     <v-list-item-content>
-                      <v-list-item-title>
-                        {{ usuario.nome }}
-                      </v-list-item-title>
+                      <v-list-item-title>{{ usuario.nome }}</v-list-item-title>
                       <v-list-item-subtitle class="email-subtitle">
                         {{ usuario.email }}
                       </v-list-item-subtitle>
                     </v-list-item-content>
                   </v-col>
 
-                  <!-- Botões de editar e excluir à direita -->
+                  <!-- Botões de ação -->
                   <v-col cols="3" class="d-flex justify-end">
                     <v-list-item-action>
-                      <v-btn
-                        icon
-                        small
-                        color="primary"
-                        class="mr-2"
-                        @click="$router.push(`/usuarios/${usuario._id}/editar`)"
-                      >
-                        <v-icon>mdi-pencil</v-icon>
-                      </v-btn>
-                      <v-btn
-                        icon
-                        small
-                        color="red"
-                        @click="deleteUsuario(usuario._id)"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
+                      <template v-for="action in actions" :key="action.name">
+                        <v-btn
+                          :icon="true"
+                          :small="true"
+                          :color="action.color"
+                          @click="action.handler(usuario._id)"
+                        >
+                          <v-icon>{{ action.icon }}</v-icon>
+                        </v-btn>
+                      </template>
                     </v-list-item-action>
                   </v-col>
                 </v-row>
@@ -56,10 +49,10 @@
           </v-card-text>
         </v-card>
 
-        <!-- Mensagem de "nenhum usuário encontrado" caso a lista esteja vazia -->
+        <!-- Mensagem se não houver usuários -->
         <v-card v-else elevation="1" class="user-card">
           <v-card-title class="text-h6">Nenhum Usuário Encontrado</v-card-title>
-          <v-card-text>Não há usuários cadastrados no momento.</v-card-text>
+          <v-card-text>{{ emptyMessage }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -69,55 +62,65 @@
 <script>
 import axios from "axios";
 
+const API_URL = "http://localhost:3000/usuarios";
+
 export default {
   data() {
     return {
       usuarios: [],
+      actions: [
+        {
+          name: "edit",
+          icon: "mdi-pencil",
+          color: "primary",
+          handler: (id) => this.editUsuario(id),
+        },
+        {
+          name: "delete",
+          icon: "mdi-delete",
+          color: "red",
+          handler: (id) => this.deleteUsuario(id),
+        },
+      ],
+      emptyMessage: "Não há usuários cadastrados no momento.",
     };
   },
   created() {
     this.fetchUsuarios();
   },
   methods: {
-    async fetchUsuarios() {
+    async handleApiRequest(method, url, onSuccess, errorMessage) {
       try {
-        const response = await axios.get("http://localhost:3000/usuarios");
-        this.usuarios = response.data;
+        const response = await axios[method](url);
+        if (onSuccess) onSuccess(response.data);
       } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
+        console.error(errorMessage, error);
       }
     },
-    async deleteUsuario(id) {
-      try {
-        await axios.delete(`http://localhost:3000/usuarios/${id}`);
-        this.fetchUsuarios(); // Atualiza a lista após exclusão
-      } catch (error) {
-        console.error("Erro ao excluir usuário:", error);
-      }
+    fetchUsuarios() {
+      this.handleApiRequest(
+        "get",
+        API_URL,
+        (data) => (this.usuarios = data),
+        "Erro ao buscar usuários"
+      );
+    },
+    deleteUsuario(id) {
+      this.handleApiRequest(
+        "delete",
+        `${API_URL}/${id}`,
+        () => this.fetchUsuarios(),
+        "Erro ao excluir usuário"
+      );
+    },
+    editUsuario(id) {
+      this.$router.push(`/usuarios/${id}/editar`);
     },
   },
 };
 </script>
 
 <style scoped>
-.user-link {
-  text-decoration: none;
-  color: #1e88e5;
-  font-weight: 500;
-  font-size: 16px;
-}
-
-/* Removendo o hover azul */
-.user-link:hover {
-  color: #1e88e5; /* Mantém a mesma cor, sem efeito de hover */
-}
-
-.email-subtitle {
-  color: #9e9e9e;
-  font-size: 14px;
-  margin-top: 4px;
-}
-
 .user-list-item {
   padding: 10px 16px;
   border-radius: 8px;
@@ -131,6 +134,12 @@ export default {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.email-subtitle {
+  color: #9e9e9e;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
 .v-btn {
   min-width: 32px;
   min-height: 32px;
@@ -139,10 +148,6 @@ export default {
 
 .v-btn:hover {
   transform: scale(1.05);
-}
-
-.v-icon {
-  color: #ffffff;
 }
 
 .v-card-title {
@@ -155,21 +160,9 @@ export default {
   background-color: #ffffff;
 }
 
-.v-card-text {
-  padding-top: 0;
-}
-
 .user-card {
   margin-bottom: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.v-divider {
-  margin: 8px 0;
-}
-
-.mr-2 {
-  margin-right: 8px;
 }
 </style>

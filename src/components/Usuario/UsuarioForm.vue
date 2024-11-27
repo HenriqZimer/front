@@ -11,66 +11,18 @@
 
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
-              <v-text-field
-                v-model="usuario.nome"
-                label="Nome"
-                required
-                prepend-icon="mdi-account"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.cpf"
-                label="CPF"
-                required
-                prepend-icon="mdi-card-account-details"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.cnh"
-                label="CNH"
-                required
-                prepend-icon="mdi-car"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.endereco"
-                label="Endereço"
-                required
-                prepend-icon="mdi-home"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.telefone"
-                label="Telefone"
-                required
-                prepend-icon="mdi-phone"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.email"
-                label="Email"
-                required
-                prepend-icon="mdi-email"
-                type="email"
-                :rules="[
-                  (v) => !!v || 'O campo é obrigatório',
-                  (v) => /.+@.+\..+/.test(v) || 'E-mail inválido',
-                ]"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="usuario.senha"
-                label="Senha"
-                required
-                prepend-icon="mdi-lock"
-                type="password"
-                :rules="[(v) => !!v || 'O campo é obrigatório']"
-              ></v-text-field>
+              <!-- Campos Dinâmicos -->
+              <template v-for="field in fields" :key="field.model">
+                <v-text-field
+                  v-model="usuario[field.model]"
+                  :label="field.label"
+                  :type="field.type || 'text'"
+                  :prepend-icon="field.icon"
+                  :rules="field.rules"
+                  required
+                  class="mb-4"
+                ></v-text-field>
+              </template>
             </v-form>
           </v-card-text>
 
@@ -91,6 +43,9 @@
 <script>
 import axios from "axios";
 
+const API_URL = "http://localhost:3000";
+const AUTH_URL = `${API_URL}/auth/registrar`;
+
 export default {
   props: ["id"],
   data() {
@@ -106,44 +61,97 @@ export default {
       },
       valid: false,
       isEditing: false,
+      fields: [
+        {
+          model: "nome",
+          label: "Nome",
+          icon: "mdi-account",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+        {
+          model: "cpf",
+          label: "CPF",
+          icon: "mdi-card-account-details",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+        {
+          model: "cnh",
+          label: "CNH",
+          icon: "mdi-car",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+        {
+          model: "endereco",
+          label: "Endereço",
+          icon: "mdi-home",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+        {
+          model: "telefone",
+          label: "Telefone",
+          icon: "mdi-phone",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+        {
+          model: "email",
+          label: "Email",
+          type: "email",
+          icon: "mdi-email",
+          rules: [
+            (v) => !!v || "O campo é obrigatório",
+            (v) => /.+@.+\..+/.test(v) || "E-mail inválido",
+          ],
+        },
+        {
+          model: "senha",
+          label: "Senha",
+          type: "password",
+          icon: "mdi-lock",
+          rules: [(v) => !!v || "O campo é obrigatório"],
+        },
+      ],
     };
   },
   created() {
     if (this.id) {
       this.isEditing = true;
-      this.fetchUsuario();
+      this.handleApiRequest(
+        "get",
+        `${API_URL}/usuarios/${this.id}`,
+        (data) => {
+          this.usuario = data;
+        },
+        "Erro ao buscar usuário."
+      );
     }
   },
   methods: {
-    async fetchUsuario() {
+    async handleApiRequest(method, url, onSuccess, errorMessage) {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/usuarios/${this.id}`
-        );
-        this.usuario = response.data;
+        const response = await axios[method](url, this.usuario);
+        if (onSuccess) onSuccess(response.data);
       } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
+        console.error(errorMessage, error);
       }
     },
-    async handleSubmit() {
-      try {
-        if (this.isEditing) {
-          await axios.put(
-            `http://localhost:3000/usuarios/${this.id}`,
-            this.usuario
-          );
-          console.log("Usuário atualizado com sucesso!");
-        } else {
-          await axios.post(
-            "http://localhost:3000/auth/registrar",
-            this.usuario
-          );
-          console.log("Usuário criado com sucesso!");
-        }
-        this.$router.push("/usuarios");
-      } catch (error) {
-        console.error("Erro ao cadastrar o usuário:", error);
-      }
+    handleSubmit() {
+      const url = this.isEditing
+        ? `${API_URL}/usuarios/${this.id}`
+        : AUTH_URL;
+      const method = this.isEditing ? "put" : "post";
+      const successMessage = this.isEditing
+        ? "Usuário atualizado com sucesso!"
+        : "Usuário criado com sucesso!";
+
+      this.handleApiRequest(
+        method,
+        url,
+        () => {
+          console.log(successMessage);
+          this.$router.push("/usuarios");
+        },
+        "Erro ao salvar usuário."
+      );
     },
     handleCancel() {
       this.$router.push("/usuarios");

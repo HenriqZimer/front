@@ -2,8 +2,12 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <!-- Verifica se há pagamentos na lista -->
-        <v-card v-if="pagamentos.length > 0" elevation="1" class="pagamento-card">
+        <!-- Card de Pagamentos -->
+        <v-card
+          v-if="pagamentos.length > 0"
+          elevation="1"
+          class="pagamento-card"
+        >
           <v-card-title class="text-h6">Lista de Pagamentos</v-card-title>
 
           <v-divider></v-divider>
@@ -16,35 +20,33 @@
                 class="pagamento-list-item"
               >
                 <v-row align="center" justify="space-between" class="pa-4">
-                  <!-- Informações do pagamento à esquerda -->
+                  <!-- Informações do pagamento -->
                   <v-col cols="9">
                     <v-list-item-content>
                       <v-list-item-title>
-                        Cliente: {{ pagamento.idCliente }} | Carro: {{ pagamento.idCarro }} | Valor: R$ {{ pagamento.valor }} | Data: {{ pagamento.dataPagamento }} | Forma: {{ pagamento.formaPagamento }}
+                        Cliente: {{ pagamento.idCliente }} | Carro:
+                        {{ pagamento.idCarro }} | Valor: R$
+                        {{ pagamento.valor }} | Data:
+                        {{ pagamento.dataPagamento }} | Forma:
+                        {{ pagamento.formaPagamento }}
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-col>
 
-                  <!-- Botões de editar e excluir à direita -->
+                  <!-- Botões de ação -->
                   <v-col cols="3" class="d-flex justify-end">
                     <v-list-item-action>
-                      <v-btn
-                        icon
-                        small
-                        color="primary"
-                        class="mr-2"
-                        @click="$router.push(`/pagamentos/${pagamento._id}/editar`)"
-                      >
-                        <v-icon>mdi-pencil</v-icon>
-                      </v-btn>
-                      <v-btn
-                        icon
-                        small
-                        color="red"
-                        @click="deletePagamento(pagamento._id)"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
+                      <template v-for="action in actions" :key="action.name">
+                        <v-btn
+                          :icon="true"
+                          :small="true"
+                          :color="action.color"
+                          :class="action.class"
+                          @click="action.handler(pagamento._id)"
+                        >
+                          <v-icon>{{ action.icon }}</v-icon>
+                        </v-btn>
+                      </template>
                     </v-list-item-action>
                   </v-col>
                 </v-row>
@@ -53,12 +55,10 @@
           </v-card-text>
         </v-card>
 
-        <!-- Mensagem de "nenhum pagamento encontrado" caso a lista esteja vazia -->
+        <!-- Mensagem se não houver pagamentos -->
         <v-card v-else elevation="1" class="pagamento-card">
           <v-card-title class="text-h6">Nenhum Pagamento Encontrado</v-card-title>
-          <v-card-text>
-            Não há pagamentos cadastrados no momento.
-          </v-card-text>
+          <v-card-text>{{ emptyMessage }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -68,44 +68,66 @@
 <script>
 import axios from "axios";
 
+const API_URL = "http://localhost:3000/pagamentos";
+
 export default {
   data() {
     return {
       pagamentos: [],
+      actions: [
+        {
+          name: "edit",
+          icon: "mdi-pencil",
+          color: "primary",
+          class: "mr-2",
+          handler: (id) => this.editPagamento(id),
+        },
+        {
+          name: "delete",
+          icon: "mdi-delete",
+          color: "red",
+          handler: (id) => this.deletePagamento(id),
+        },
+      ],
+      emptyMessage: "Não há pagamentos cadastrados no momento.",
     };
   },
   created() {
     this.fetchPagamentos();
   },
   methods: {
-    async fetchPagamentos() {
+    async handleApiRequest(method, url, onSuccess, errorMessage) {
       try {
-        const response = await axios.get("http://localhost:3000/pagamentos");
-        this.pagamentos = response.data;
+        const response = await axios[method](url);
+        if (onSuccess) onSuccess(response.data);
       } catch (error) {
-        console.error("Erro ao buscar pagamentos:", error);
+        console.error(errorMessage, error);
       }
     },
-    async deletePagamento(id) {
-      try {
-        await axios.delete(`http://localhost:3000/pagamentos/${id}`);
-        this.fetchPagamentos(); // Atualiza a lista após exclusão
-      } catch (error) {
-        console.error("Erro ao excluir pagamento:", error);
-      }
+    fetchPagamentos() {
+      this.handleApiRequest(
+        "get",
+        API_URL,
+        (data) => (this.pagamentos = data),
+        "Erro ao buscar pagamentos"
+      );
+    },
+    deletePagamento(id) {
+      this.handleApiRequest(
+        "delete",
+        `${API_URL}/${id}`,
+        () => this.fetchPagamentos(),
+        "Erro ao excluir pagamento"
+      );
+    },
+    editPagamento(id) {
+      this.$router.push(`/pagamentos/${id}/editar`);
     },
   },
 };
 </script>
 
 <style scoped>
-.pagamento-link {
-  text-decoration: none;
-  color: #1e88e5;
-  font-weight: 500;
-  font-size: 16px;
-}
-
 .pagamento-list-item {
   padding: 10px 16px;
   border-radius: 8px;
@@ -139,21 +161,9 @@ export default {
   background-color: #ffffff;
 }
 
-.v-card-text {
-  padding-top: 0;
-}
-
 .pagamento-card {
   margin-bottom: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.v-divider {
-  margin: 8px 0;
-}
-
-.mr-2 {
-  margin-right: 8px;
 }
 </style>

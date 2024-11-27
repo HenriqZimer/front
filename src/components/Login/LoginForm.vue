@@ -1,10 +1,6 @@
 <template>
   <v-container fluid fill-height>
-    <v-row
-      align="center"
-      justify="center"
-      class="fill-height"
-    >
+    <v-row align="center" justify="center" class="fill-height">
       <v-col cols="12" md="4">
         <v-card class="elevation-12" outlined>
           <v-card-title class="text-center text-h5">Login</v-card-title>
@@ -16,7 +12,7 @@
                 label="E-mail"
                 type="email"
                 required
-                :rules="[emailRules]"
+                :rules="validationRules.email"
               ></v-text-field>
 
               <v-text-field
@@ -24,7 +20,7 @@
                 label="Senha"
                 type="password"
                 required
-                :rules="[(v) => !!v || 'Senha é obrigatória']"
+                :rules="validationRules.senha"
               ></v-text-field>
 
               <!-- Mensagem de erro -->
@@ -48,35 +44,48 @@
 <script>
 import axios from "axios";
 
+const API_URL = "http://localhost:3000/auth/login"; // URL centralizada para o endpoint
+
 export default {
   data() {
     return {
       email: "",
       senha: "",
       valid: false,
-      loginError: false, // Controle de exibição de erro
+      loginError: false,
       loginErrorMessage: "",
-      emailRules: [
-        (v) => !!v || "E-mail é obrigatório",
-        (v) => /.+@.+\..+/.test(v) || "E-mail inválido",
-      ],
+      validationRules: {
+        email: [
+          (v) => !!v || "E-mail é obrigatório",
+          (v) => /.+@.+\..+/.test(v) || "E-mail inválido",
+        ],
+        senha: [(v) => !!v || "Senha é obrigatória"],
+      },
     };
   },
   methods: {
     async handleSubmit() {
+      if (!this.valid) return;
+
       try {
         this.loginError = false;
-        const response = await axios.post("http://localhost:3000/auth/login", {
+        const response = await axios.post(API_URL, {
           email: this.email,
           senha: this.senha,
         });
-        localStorage.setItem("token", response.data.access_token); // Salva o token
-        this.$router.push("/"); // Redireciona após o login
+        this.handleSuccess(response.data);
       } catch (error) {
-        this.loginError = true;
-        this.loginErrorMessage = "Credenciais inválidas. Tente novamente.";
-        console.error("Erro ao realizar login:", error);
+        this.handleError(error);
       }
+    },
+    handleSuccess(data) {
+      localStorage.setItem("token", data.access_token);
+      this.$router.push("/"); // Redireciona após login
+    },
+    handleError(error) {
+      this.loginError = true;
+      this.loginErrorMessage = "Credenciais inválidas. Tente novamente.";
+      console.error("Erro ao realizar login:", error);
     },
   },
 };

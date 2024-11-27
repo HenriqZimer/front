@@ -3,26 +3,31 @@
     <v-row align="center" justify="center">
       <v-col cols="12" md="8" lg="6" class="text-center">
         <v-card elevation="12" class="pa-5 home-card">
+          <!-- Título com Slot -->
           <v-card-title class="headline">
-            BEM-VINDO AO <br />
-            SISTEMA DE ALUGUEL DE CARROS!
+            <slot name="title">BEM-VINDO AO SISTEMA DE ALUGUEL DE CARROS!</slot>
           </v-card-title>
 
           <v-divider class="my-4"></v-divider>
 
+          <!-- Subtítulo com Slot -->
           <v-card-text>
-            <p class="subheading">
-              Gerencie usuários, carros, aluguéis e pagamentos <br />
-              de maneira simples e eficiente.
-            </p>
+            <slot name="subtitle">
+              <p class="subheading">
+                Gerencie usuários, carros, aluguéis e pagamentos <br />
+                de maneira simples e eficiente.
+              </p>
+            </slot>
           </v-card-text>
 
+          <!-- Botões de Navegação -->
           <v-card-actions class="justify-center">
             <v-btn
               color="primary"
               large
               class="ma-2 home-btn"
               @click="$router.push('/carros')"
+              aria-label="Ver carros disponíveis"
             >
               ver carros disponíveis
             </v-btn>
@@ -31,6 +36,7 @@
               large
               class="ma-2 home-btn"
               @click="$router.push('/alugueis')"
+              aria-label="Meus aluguéis"
             >
               meus aluguéis
             </v-btn>
@@ -48,15 +54,16 @@ export default {
 </script>
 
 <style scoped>
+/* Layout da Home */
 .home-container {
-  min-height: 100vh;
+  min-height: 93vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #d0e8f2 0%, #f8f9fa 100%);
 }
 
-/* Título em uppercase */
+/* Estilo do título */
 .headline {
   font-weight: 700;
   color: #1565c0;
@@ -73,6 +80,7 @@ export default {
   line-height: 1.6;
 }
 
+/* Card principal */
 .home-card {
   background-color: #ffffff;
   padding: 40px;
@@ -80,6 +88,7 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Botões */
 .v-btn {
   width: 240px;
   font-weight: bold;
@@ -88,9 +97,9 @@ export default {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Remover o uppercase dos botões */
-.v-btn .v-btn__content {
-  font-size: 1rem;
+.v-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .home-btn {
