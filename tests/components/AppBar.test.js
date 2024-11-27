@@ -1,5 +1,4 @@
 import AppBar from '../../src/components/Shared/AppBar.vue';
-
 import { mount } from '@vue/test-utils';
 import { describe, it, expect } from 'vitest';
 

@@ -1,15 +1,16 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+// vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
     environment: 'jsdom',
-    // Adicione o mock aqui
-    alias: {
-      '^.+\\.css$': '/test/styleMock.js',
+    server: {
+      deps: {
+        inline: ['vuetify'],
+      },
     },
   },
-});
+})

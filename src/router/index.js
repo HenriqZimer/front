@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginForm from '../components/Login/LoginForm.vue'; // Componente de login
+import Login from '../components/Login/Login.vue'; // Componente de login
 import Home from '../views/Home.vue';
 import UsuarioView from '../views/UsuarioView.vue';
 import CarroView from '../views/CarroView.vue';
@@ -13,7 +13,7 @@ import AluguelForm from '../components/Aluguel/AluguelForm.vue';
 import PagamentoForm from '../components/Pagamento/PagamentoForm.vue';
 
 const routes = [
-  { path: '/login', name: 'Login', component: LoginForm }, // Rota de login
+  { path: '/login', name: 'Login', component: Login }, // Rota de login
 
   {
     path: '/',
