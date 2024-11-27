@@ -6,11 +6,9 @@ import CarroView from '../views/CarroView.vue';
 import AluguelView from '../views/AluguelView.vue';
 import PagamentoView from '../views/PagamentoView.vue';
 import UsuarioList from '../components/Usuario/UsuarioList.vue';
-import UsuarioDetail from '../components/Usuario/UsuarioDetail.vue';
 import UsuarioForm from '../components/Usuario/UsuarioForm.vue';
 import CarroForm from '../components/Carro/CarroForm.vue';
 import CarroList from '../components/Carro/CarroList.vue';
-import CarroDetail from '../components/Carro/CarroDetail.vue';
 import AluguelForm from '../components/Aluguel/AluguelForm.vue';
 import PagamentoForm from '../components/Pagamento/PagamentoForm.vue';
 
@@ -28,14 +26,12 @@ const routes = [
   { path: '/usuarios', name: 'Usuarios', component: UsuarioView },
   { path: '/usuarios', name: 'UsuarioList', component: UsuarioList },
   { path: '/usuarios/novo', name: 'NovoUsuario', component: UsuarioForm },
-  { path: '/usuarios/:id', name: 'UsuarioDetail', component: UsuarioDetail, props: true },
   { path: '/usuarios/:id/editar', name: 'UsuarioEdit', component: UsuarioForm, props: true },
 
   // Rotas de carros
   { path: '/carros', name: 'Carros', component: CarroView },
   { path: '/carros', name: 'CarroList', component: CarroList },
   { path: '/carros/novo', name: 'CarroForm', component: CarroForm },
-  { path: '/carros/:id', name: 'CarroDetail', component: CarroDetail, props: true },
   { path: '/carros/:id/editar', name: 'CarroEdit', component: CarroForm, props: true },
 
   // Rotas de aluguéis
