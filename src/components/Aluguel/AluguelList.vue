@@ -3,11 +3,7 @@
     <v-row justify="center">
       <v-col cols="12" md="8">
         <!-- Card de Aluguéis -->
-        <v-card
-          v-if="alugueis.length > 0"
-          elevation="1"
-          class="aluguel-card"
-        >
+        <v-card v-if="alugueis.length > 0" elevation="1" class="aluguel-card">
           <v-card-title class="text-h6">Lista de Aluguéis</v-card-title>
           <v-divider></v-divider>
           <v-card-text>
@@ -22,8 +18,9 @@
                   <v-col cols="9">
                     <v-list-item-content>
                       <v-list-item-title>
-                        Data: {{ aluguel.dataInicio }} até {{ aluguel.dataFim }}
-                        | Valor: R$ {{ aluguel.valorTotal }} | Status:
+                        Data: {{ aluguel.dataInicio }} até
+                        {{ aluguel.dataFim }} | Valor: R$
+                        {{ aluguel.valorTotal }} | Status:
                         {{ aluguel.status }}
                       </v-list-item-title>
                     </v-list-item-content>
@@ -37,6 +34,7 @@
                           :icon="true"
                           :small="true"
                           :color="action.color"
+                          :aria-label="action.name"
                           :class="action.class"
                           @click="action.handler(aluguel._id)"
                         >
@@ -54,7 +52,7 @@
         <!-- Mensagem de lista vazia -->
         <v-card v-else elevation="1" class="aluguel-card">
           <v-card-title class="text-h6">Nenhum Aluguel Encontrado</v-card-title>
-          <v-card-text>{{ emptyMessage }}</v-card-text>
+          <v-card-text>Não há aluguéis cadastrados no momento.</v-card-text>
         </v-card>
       </v-col>
     </v-row>

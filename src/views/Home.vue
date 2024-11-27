@@ -25,7 +25,7 @@
             <v-btn
               color="primary"
               large
-              class="ma-2 home-btn"
+              class="home-btn"
               @click="$router.push('/carros')"
               aria-label="Ver carros disponíveis"
             >
@@ -34,7 +34,7 @@
             <v-btn
               color="secondary"
               large
-              class="ma-2 home-btn"
+              class="home-btn"
               @click="$router.push('/alugueis')"
               aria-label="Meus aluguéis"
             >
@@ -99,11 +99,11 @@ export default {
 
 .v-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .home-btn {
-  padding: 20px;
+  margin: 20px;
+  padding: 30px;
   font-size: 1rem;
 }
 </style>
